@@ -36,14 +36,14 @@
 static const char *TAG = "GAME1";
 static const char *TEST_TAG = "esp-test";
 
-#define TEST_ASSERT_MESSAGE( condition, ...)                        \
+#define TEST_ASSERT_MESSAGE( condition, ...)                                \
     if (condition)                                                          \
     {                                                                       \
         ESP_LOGI(TEST_TAG, "test passed");                                  \
     }                                                                       \
     else                                                                    \
-    {                                                                                 \
-        ESP_LOGE(TEST_TAG, __VA_ARGS__);               \
+    {                                                                       \
+        ESP_LOGE(TEST_TAG, __VA_ARGS__);                                    \
     }
 
 esp_err_t start_rest_server(const char *base_path);
@@ -142,333 +142,204 @@ esp_err_t init_fs(void)
 }
 #endif
 
-void test_WinMove(int *myBoard) {
-    //1ST TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard, 2, HUMAN);
-    add_coin(myBoard, 2, HUMAN);
-    add_coin(myBoard, 2, HUMAN);
-    TEST_ASSERT_MESSAGE(check_vertical(myBoard, 2,HUMAN)==true,
-                "1st test: move makes vertical four");
-    //2ND TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard, 2, HUMAN);
-    add_coin(myBoard, 2, HUMAN);
-    TEST_ASSERT_MESSAGE(check_vertical(myBoard,2, HUMAN)==false,
-                "2nd test: move doesn't make vertical four");
-    //3RD TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard,4,HUMAN); add_coin(myBoard,3,COMPUTER);
-    add_coin(myBoard,5,HUMAN); add_coin(myBoard,4,COMPUTER);
-    add_coin(myBoard,3,HUMAN);
-    TEST_ASSERT_MESSAGE(check_vertical(myBoard,3,COMPUTER)==false,
-                        "3rd test: move doesn't make vertical four");
-    //4TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard, 1, HUMAN);
-    add_coin(myBoard, 2, HUMAN);
-    add_coin(myBoard, 3, HUMAN);
-    TEST_ASSERT_MESSAGE(check_horizontal(myBoard,4,HUMAN) == true,
-                        "4th test: move makes horizontal four");
-    //5TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard, 1, HUMAN);
-    add_coin(myBoard, 2, COMPUTER);
-    add_coin(myBoard, 3, HUMAN);
-    TEST_ASSERT_MESSAGE(check_horizontal(myBoard,4,HUMAN) == false,
-                        "5th test: move doesn't make horizontal four");
-    //6TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard, 1, HUMAN);
-    add_coin(myBoard, 4, HUMAN);
-    add_coin(myBoard, 3, HUMAN);
-    TEST_ASSERT_MESSAGE(check_horizontal(myBoard,2,HUMAN) == true,
-                        "6th test: move makes a horizontal four");
-    //7TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard, 2, HUMAN); add_coin(myBoard, 3, COMPUTER);
-    add_coin(myBoard, 2, HUMAN); add_coin(myBoard, 3, COMPUTER);
-    add_coin(myBoard, 3, HUMAN); add_coin(myBoard, 4, COMPUTER);
-    add_coin(myBoard, 2, HUMAN); add_coin(myBoard, 5, COMPUTER);
-    add_coin(myBoard, 3, HUMAN);
-    TEST_ASSERT_MESSAGE(check_horizontal(myBoard,6,COMPUTER)==true,
-                        "7th test: move makes a horizontal four");
-    //8TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard,4,HUMAN); add_coin(myBoard,3,COMPUTER);
-    add_coin(myBoard,5,HUMAN); add_coin(myBoard,4,COMPUTER);
-    add_coin(myBoard,3,HUMAN);
-    TEST_ASSERT_MESSAGE(check_horizontal(myBoard,3,COMPUTER)==false,
-                        "8th test: move makes a horizontal four");
-    //9th TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard,0,HUMAN); add_coin(myBoard,0,COMPUTER);
-    add_coin(myBoard,0,COMPUTER); add_coin(myBoard,0,HUMAN);
-    add_coin(myBoard,1,COMPUTER); add_coin(myBoard,1,HUMAN);
-    add_coin(myBoard,1,HUMAN); add_coin(myBoard,2,HUMAN);
-    add_coin(myBoard,2,HUMAN);
-    TEST_ASSERT_MESSAGE(check_diagonal_negative(myBoard,3,HUMAN) == true,
-                        "9th test: move makes diagonal (negative) four");
-    //10TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard,2,HUMAN); add_coin(myBoard,2,COMPUTER);
-    add_coin(myBoard,2,COMPUTER); add_coin(myBoard,2,HUMAN);
-    add_coin(myBoard,3,COMPUTER); add_coin(myBoard,3,HUMAN);
-    add_coin(myBoard,4,HUMAN); add_coin(myBoard,4,COMPUTER);
-    add_coin(myBoard,5,COMPUTER);
-    TEST_ASSERT_MESSAGE(check_diagonal_negative(myBoard,3,HUMAN) == false,
-                        "10th test: move doesn't make diagonal (negative) four");
-    //11TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard,4,HUMAN); add_coin(myBoard,3,COMPUTER);
-    add_coin(myBoard,5,HUMAN); add_coin(myBoard,4,COMPUTER);
-    add_coin(myBoard,3,HUMAN);
-    TEST_ASSERT_MESSAGE(check_diagonal_negative(myBoard,3,COMPUTER)==false,
-                        "11th test: move doesn't make diagonal (negative) four");
-    //12TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard,2,COMPUTER); add_coin(myBoard,3,HUMAN);
-    add_coin(myBoard,4,COMPUTER); add_coin(myBoard,5,HUMAN);
-    add_coin(myBoard,2,COMPUTER); add_coin(myBoard,3,HUMAN);
-    add_coin(myBoard,4,HUMAN); add_coin(myBoard,5,HUMAN);
-    add_coin(myBoard,3,COMPUTER); add_coin(myBoard,4,HUMAN);
-    add_coin(myBoard,5,COMPUTER); add_coin(myBoard,4,COMPUTER);
-    add_coin(myBoard,5,COMPUTER);
-    TEST_ASSERT_MESSAGE(check_diagonal_positive(myBoard,5,COMPUTER) == true,
-                        "12th test: move makes a diagonal (positive) four");
-    //13TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard,2,COMPUTER); add_coin(myBoard,3,HUMAN);
-    add_coin(myBoard,4,COMPUTER); add_coin(myBoard,5,HUMAN);
-    add_coin(myBoard,2,COMPUTER); add_coin(myBoard,3,HUMAN);
-    add_coin(myBoard,4,HUMAN); add_coin(myBoard,5,HUMAN);
-    add_coin(myBoard,3,COMPUTER); add_coin(myBoard,4,HUMAN);
-    add_coin(myBoard,5,COMPUTER); add_coin(myBoard,4,COMPUTER);
-    add_coin(myBoard,5,COMPUTER);
-    TEST_ASSERT_MESSAGE(check_diagonal_positive(myBoard,1,COMPUTER) == true,
-                        "13th test: move makes a diagonal (positive) four");
-    //14TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard,6,COMPUTER); add_coin(myBoard,6,COMPUTER);
-    add_coin(myBoard,6,HUMAN); add_coin(myBoard,6,HUMAN);
-    add_coin(myBoard,5,COMPUTER); add_coin(myBoard,5,COMPUTER);
-    add_coin(myBoard,4,COMPUTER); add_coin(myBoard,4,HUMAN);
-    add_coin(myBoard,3,HUMAN);
-    TEST_ASSERT_MESSAGE(check_diagonal_positive(myBoard,5,HUMAN)==true,
-                        "14th test: move makes a diagonal (positive) four");
-    //15TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard,4,HUMAN);
-    add_coin(myBoard,3,COMPUTER);
-    add_coin(myBoard,5,HUMAN);
-    add_coin(myBoard,4,COMPUTER);
-    add_coin(myBoard,3,HUMAN);
-    TEST_ASSERT_MESSAGE(check_diagonal_positive(myBoard,3,COMPUTER)==false,
-                        "15th test: move doesn't make a diagonal (positive) four");
-    //16TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard, 2, HUMAN); add_coin(myBoard, 3, COMPUTER);
-    add_coin(myBoard, 2, HUMAN); add_coin(myBoard, 3, COMPUTER);
-    add_coin(myBoard, 3, HUMAN); add_coin(myBoard, 4, COMPUTER);
-    add_coin(myBoard, 2, HUMAN); add_coin(myBoard, 5, COMPUTER);
-    add_coin(myBoard, 3, HUMAN);
-    TEST_ASSERT_MESSAGE(is_it_win_move(myBoard,6,COMPUTER)==true,
-                        "16th test: move makes a diagonal (positive) four");
-    //17TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard,2,COMPUTER); add_coin(myBoard,3,HUMAN);
-    add_coin(myBoard,3,HUMAN); add_coin(myBoard,4,HUMAN);
-    add_coin(myBoard,4,HUMAN); add_coin(myBoard,4,COMPUTER);
-    add_coin(myBoard,5,COMPUTER);
-    TEST_ASSERT_MESSAGE(check_four(myBoard)==false,
-                        "17th test: check win should have failed");
-    //18TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard,0,COMPUTER); add_coin(myBoard,0,COMPUTER);
-    add_coin(myBoard,0,HUMAN); add_coin(myBoard,1,COMPUTER);
-    add_coin(myBoard,1,COMPUTER); add_coin(myBoard,1,HUMAN);
-    add_coin(myBoard,1,COMPUTER); add_coin(myBoard,2,HUMAN);
-    add_coin(myBoard,2,HUMAN); add_coin(myBoard,2,COMPUTER);
-    add_coin(myBoard,2,HUMAN); add_coin(myBoard,3,HUMAN);
-    add_coin(myBoard,3,HUMAN); add_coin(myBoard,4,HUMAN);
-    add_coin(myBoard,4,COMPUTER); add_coin(myBoard,4,HUMAN);
-    add_coin(myBoard,4,COMPUTER); add_coin(myBoard,4,COMPUTER);
-    add_coin(myBoard,5,COMPUTER); add_coin(myBoard,5,HUMAN);
-    add_coin(myBoard,6,HUMAN); add_coin(myBoard,6,COMPUTER);
-    TEST_ASSERT_MESSAGE(check_four(myBoard)==false,
-                        "18th test: check win should have failed");
+void test_initialisation(bitboard bb){
+    initialise_bitboard(&bb);
+    TEST_ASSERT_MESSAGE(bb.position==0,
+                        "01: position after init should be 0 not %llu", bb.position);
+    TEST_ASSERT_MESSAGE(bb.mask==0,
+                        "02: mask after init should be 0 not %llu", bb.mask);
+    TEST_ASSERT_MESSAGE(bb.no_moves==0,
+                        "03: no of moves after init should be 0 not %d", bb.no_moves);
+    bb.position=60;
+    bb.mask=2652;
+    bb.no_moves=6;
+    TEST_ASSERT_MESSAGE(bb.position==60,
+                        "04: position after assignment should be '60' not %llu", bb.position);
+    TEST_ASSERT_MESSAGE(bb.mask==2652,
+                        "05: mask after init should be '2652' no %llu", bb.mask);
+    TEST_ASSERT_MESSAGE(bb.no_moves==6,
+                        "06: no of moves after init should be '6' not %d", bb.no_moves);
+    initialise_bitboard(&bb);
+    TEST_ASSERT_MESSAGE(bb.position==0,
+                        "07: position at the end is %llu",bb.position);
+    TEST_ASSERT_MESSAGE(bb.mask==0,
+                        "08: mask at the end is %llu",bb.position);
+    TEST_ASSERT_MESSAGE(bb.no_moves==0,
+                        "09: moves at the end is %d",bb.no_moves);
 }
-void test_LittleGame(int *myBoard) {
-    initializeBoard(myBoard);
-    add_coin(myBoard,0,COMPUTER); add_coin(myBoard,2,HUMAN);
-    add_coin(myBoard,2,HUMAN); add_coin(myBoard,2,COMPUTER);
-    add_coin(myBoard,4,COMPUTER); add_coin(myBoard,4,HUMAN);
-    add_coin(myBoard,5,HUMAN); add_coin(myBoard,6,COMPUTER);
-    add_coin(myBoard,6,HUMAN);
-    TEST_ASSERT_MESSAGE(can_add_coin(myBoard,4)==true,
-                        "test 1: should be able to add coin into '4'");
-    TEST_ASSERT_MESSAGE(is_it_win_move(myBoard,4,COMPUTER)==false,
-                        "test 2: move into '4' does not lead to win");
-    TEST_ASSERT_MESSAGE(negamax(myBoard,2,COMPUTER).score==MEDIUM_SCORE,
-                        "test 3: expected score for depth '2' is '%d' but got %d",
-                        MEDIUM_SCORE, negamax(myBoard,2,COMPUTER).score);
-}
+void test_can_play(bitboard bb) {
+    initialise_bitboard(&bb);
+    bb.mask = 138521415198;
+    TEST_ASSERT_MESSAGE(can_play(bb.mask,2)==false,
+                  "01: test expected to fail");
+    TEST_ASSERT_MESSAGE(can_play(bb.mask,6)==true,
+                  "02: test expected to pass");
 
-void test_Evaluation(int *myBoard) {
-    //1ST TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard, 0, COMPUTER); add_coin(myBoard, 0, COMPUTER);
-    TEST_ASSERT_MESSAGE(evaluate_vertical(myBoard) == MEDIUM_SCORE,
-                        "1st test: different vertical evaluation ('%d' : %d).", MEDIUM_SCORE, evaluate_vertical(myBoard));
-    add_coin(myBoard,0,COMPUTER);
-    TEST_ASSERT_MESSAGE(evaluate_vertical(myBoard) == HIGH_SCORE,
-                        "1st test: different vertical evaluation ('%d' : %d).", HIGH_SCORE, evaluate_vertical(myBoard));
-    //2ND TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard, 3, COMPUTER); add_coin(myBoard,3,HUMAN);
-    add_coin(myBoard, 3, COMPUTER); add_coin(myBoard, 3, COMPUTER);
-    TEST_ASSERT_MESSAGE(evaluate_vertical(myBoard) == MEDIUM_SCORE,
-                        "2nd test: different vertical evaluation ('%d' : %d).", MEDIUM_SCORE,evaluate_vertical(myBoard));
-    //3RD TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard,0,COMPUTER);
-    add_coin(myBoard,1,COMPUTER);
-    TEST_ASSERT_MESSAGE(evaluate_horizontal(myBoard) == MEDIUM_SCORE,
-                        "3rd test: different horizontal evaluation ('%d' : %d).", MEDIUM_SCORE, evaluate_horizontal(myBoard));
-    add_coin(myBoard,2,COMPUTER);
-    TEST_ASSERT_MESSAGE(evaluate_horizontal(myBoard) == HIGH_SCORE,
-                        "3rd test: different horizontal evaluation ('%d' : %d).", HIGH_SCORE, evaluate_horizontal(myBoard));
-    //4TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard, 3, COMPUTER);
-    add_coin(myBoard,3,COMPUTER);
-    TEST_ASSERT_MESSAGE(evaluate_horizontal(myBoard) == 0,
-                        "4th test: different horizontal evaluation ('0' : %d).", evaluate_horizontal(myBoard));
-    //5TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard,0,COMPUTER);
-    add_coin(myBoard,1,HUMAN);
-    add_coin(myBoard,1,COMPUTER);
-    TEST_ASSERT_MESSAGE(evaluate_positive_diagonal(myBoard) == MEDIUM_SCORE,
-                        "5th test: different (positive) diagonal evaluation ('20' : %d).", evaluate_positive_diagonal(myBoard));
-    add_coin(myBoard,2,HUMAN);
-    add_coin(myBoard,2,HUMAN);
-    add_coin(myBoard,2,COMPUTER);
-    TEST_ASSERT_MESSAGE(evaluate_positive_diagonal(myBoard) == HIGH_SCORE,
-                        "5th test: different (positive) diagonal evaluation ('50' : %d).", evaluate_positive_diagonal(myBoard));
-    //6TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard,0,COMPUTER);
-    add_coin(myBoard,1,HUMAN);
-    add_coin(myBoard,1,HUMAN);
-    TEST_ASSERT_MESSAGE(evaluate_positive_diagonal(myBoard) == 0,
-                        "6th test: different (positive) diagonal evaluation ('0' : %d).", evaluate_positive_diagonal(myBoard));
-    //7TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard,1,HUMAN);
-    add_coin(myBoard,0,COMPUTER);
-    add_coin(myBoard,2,COMPUTER);
-    add_coin(myBoard,1,COMPUTER);
-    add_coin(myBoard,1,COMPUTER);
-    add_coin(myBoard,3,COMPUTER);
-    TEST_ASSERT_MESSAGE(evaluate_positive_diagonal(myBoard) == 20,
-                        "7th test: different (positive) diagonal evaluation ('20' : %d).", evaluate_positive_diagonal(myBoard));
-    //8TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard,6,HUMAN);
-    add_coin(myBoard,5,COMPUTER);
-    add_coin(myBoard,5,COMPUTER);
-    TEST_ASSERT_MESSAGE(evaluate_negative_diagonal(myBoard) == 0,
-                        "8th test: different (negative) diagonal evaluation ('0' : %d).", evaluate_negative_diagonal(myBoard));
-    //9TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard,5,HUMAN);
-    add_coin(myBoard,5,COMPUTER);
-    add_coin(myBoard,6,COMPUTER);
-    TEST_ASSERT_MESSAGE(evaluate_negative_diagonal(myBoard) == 20,
-                        "9th test: different (negative) diagonal evaluation ('20' : %d).", evaluate_negative_diagonal(myBoard));
-    //10TH TEST
-    initializeBoard(myBoard);
-    add_coin(myBoard,3,HUMAN);
-    add_coin(myBoard,2,COMPUTER);
-    add_coin(myBoard,4,COMPUTER);
-    add_coin(myBoard,3,COMPUTER);
-    add_coin(myBoard,2,COMPUTER);
-    TEST_ASSERT_MESSAGE(evaluate(myBoard) == 80,
-                        "10th test: different overall evaluation ('80' : %d).", evaluate(myBoard));
-}
-void test_Negamax_Draw(int *myBoard) {
-    //DOESN'T WORK HERE
-    int board[] = {3,3,2,2,3,3,2,
-                   3,2,3,3,2,2,3,
-                   2,3,2,2,3,3,2,
-                   3,2,3,2,2,2,3,
-                   2,3,2,2,3,3,2,
-                   0,2,3,3,3,2,0};
-    copy_board(board,myBoard);
-    TEST_ASSERT_MESSAGE(negamax(myBoard,3,HUMAN).score==0,"Negamax draw check failed, expected draw, got %d", negamax(myBoard,3,HUMAN).score);
-}
-void test_Negamax_WinMove(int *myBoard) {
-    initializeBoard(myBoard);
-    add_coin(myBoard, 2, HUMAN);
-    add_coin(myBoard, 3, COMPUTER);
-    add_coin(myBoard, 2, HUMAN);
-    add_coin(myBoard, 3, COMPUTER);
-    add_coin(myBoard, 3, HUMAN);
-    add_coin(myBoard, 4, COMPUTER);
-    add_coin(myBoard, 2, HUMAN);
-    add_coin(myBoard, 5, COMPUTER);
-    add_coin(myBoard, 3, HUMAN);
-    TEST_ASSERT_MESSAGE(negamax(myBoard,3,COMPUTER).score==WIN_SCORE,
-                        "01: Expected negamax method to score WIN SCORE.");
 
-    initializeBoard(myBoard);
-    add_coin(myBoard,4,HUMAN);
-    add_coin(myBoard,3,COMPUTER);
-    add_coin(myBoard,5,HUMAN);
-    add_coin(myBoard,4,COMPUTER);
-    add_coin(myBoard,3,HUMAN);
-    TEST_ASSERT_MESSAGE(check_vertical(myBoard,5,COMPUTER)==false,
-                        "02: Vertical check fails.");
-    TEST_ASSERT_MESSAGE(check_horizontal(myBoard,5,COMPUTER)==false,
-                        "03: Horizontal check fails.");
-    TEST_ASSERT_MESSAGE(check_diagonal_positive(myBoard,5,COMPUTER)==false,
-                        "04: Diagonal positive check fails.");
-    TEST_ASSERT_MESSAGE(check_diagonal_negative(myBoard,5,COMPUTER)==false,
-                        "05: Diagonal negative check fails.");
-    TEST_ASSERT_MESSAGE(negamax(myBoard,3,COMPUTER).score!=WIN_SCORE,
-                        "06: Not expected to score WIN SCORE.");
+    initialise_bitboard(&bb);
+    bb.mask = 138521149956;
+    TEST_ASSERT_MESSAGE(can_play(bb.mask,2)==false,
+                  "03: test expected to fail");
+    TEST_ASSERT_MESSAGE(can_play(bb.mask,1),
+                  "04: test expected to pass");
+    initialise_bitboard(&bb);
+    bb.mask = 33884764;
+    bb.position = 33557064;
+    TEST_ASSERT_MESSAGE(can_play(bb.mask,2),
+                  "05: test expected to pas");
+    play(&bb,2);
+    TEST_ASSERT_MESSAGE(bb.mask==42273372,
+                  "06: add coin into '4' failed, mask is %llu",bb.mask);
+    TEST_ASSERT_MESSAGE(can_play(bb.mask,2),
+                  "07: test expected to pas");
+    play(&bb,2);
+    TEST_ASSERT_MESSAGE(bb.mask==1116015196,
+                  "08: add coin into '4' failed");
+    play(&bb,2);
+    TEST_ASSERT_MESSAGE(can_play(bb.mask,2)==false,
+                  "09: expected to fail\nMASK: %llu\nTOPC: %llu",bb.mask, top_cell(2));
+    initialise_bitboard(&bb);
+    bb.mask = 34630287489;
+    bb.no_moves = 7;
+    TEST_ASSERT_MESSAGE(can_play(bb.mask,0)==false,
+                  "10: expected to fail");
+}
+void test_play(bitboard bb){
+    initialise_bitboard(&bb);
+    play(&bb,2);
+    TEST_ASSERT_MESSAGE(bb.no_moves==1,
+                  "01: the first move was supposed to be made");
+    TEST_ASSERT_MESSAGE(bb.mask==4,
+                  "02: the first move produced wrong mask");
+    TEST_ASSERT_MESSAGE(bb.position==4,
+                  "03: the first move produced wrong position");
+    play(&bb,2);
+    TEST_ASSERT_MESSAGE(bb.mask==516,
+                  "04: fault after move 2, mask is %llu",bb.mask);
+    TEST_ASSERT_MESSAGE(bb.position==512,
+                  "05: fault after move 2, position is %llu",bb.position);
+    TEST_ASSERT_MESSAGE(bb.no_moves==2,
+                  "06: fault after move 2, wrong no of moves %d",bb.no_moves);
+    play(&bb,2);
+    TEST_ASSERT_MESSAGE(bb.no_moves==3,
+                  "07: fault after move 3, wrong no of moves %d",bb.no_moves);
+    TEST_ASSERT_MESSAGE(bb.position==65540,
+                  "08: fault after move 3 position is %llu",bb.position);
+    TEST_ASSERT_MESSAGE(bb.mask==66052,
+                  "09: fault after move 3, mask should be %llu",bb.mask);
+    play(&bb,2);
+    TEST_ASSERT_MESSAGE(bb.mask==8454660,
+                  "10: fault after move 4");
+    TEST_ASSERT_MESSAGE(bb.position==8389120,
+                  "11: fault after move 4");
+    play(&bb,2);
+    TEST_ASSERT_MESSAGE(bb.mask==1082196484,
+                  "12: expected different mask");
+    TEST_ASSERT_MESSAGE(bb.no_moves==5,
+                  "13: expected to make '5' moves but got %d",bb.no_moves);
+    TEST_ASSERT_MESSAGE(bb.position==1073807364,
+                  "14: expected different position, %llu",bb.position);
+    TEST_ASSERT_MESSAGE(can_play(bb.mask,5),
+                  "15: move into 5 should be allowed");
+    play(&bb,5);
+    TEST_ASSERT_MESSAGE(bb.no_moves==6,
+                  "16: there should be 6 moves");
+    TEST_ASSERT_MESSAGE(bb.position==8389152,
+                  "17: expected different position, got %llu",bb.position);
+    TEST_ASSERT_MESSAGE(bb.mask==1082196516,
+                  "18: expected different mask, got %llu",bb.mask);
 
 }
-void test_Negamax_Search(int *myBoard) {
-    initializeBoard(myBoard);
-    add_coin(myBoard,2,HUMAN);
-    add_coin(myBoard,3,COMPUTER);
-    add_coin(myBoard,3,HUMAN);
-    add_coin(myBoard,4,COMPUTER);
-    TEST_ASSERT_MESSAGE(negamax(myBoard,2,COMPUTER).score==-WIN_SCORE,
-                        "test 1: expected search to give WIN in 2 moves: '110' instead of %d",
-                        negamax(myBoard,2,COMPUTER).score);
-    TEST_ASSERT_MESSAGE(negamax(myBoard,4,COMPUTER).col==5 || negamax(myBoard,4,COMPUTER).col==6,
-                        "test 2:expected search to give col '5' or '6' instead of %d",
-                        negamax(myBoard,4,COMPUTER).col);
-    add_coin(myBoard, negamax(myBoard,4,COMPUTER).col,COMPUTER);
-
-    TEST_ASSERT_MESSAGE(myBoard[5]==COMPUTER,
-                        "test 3: incorrect add coin");
+void test_check_win(bitboard bb){
+    initialise_bitboard(&bb);
+    bb.position = 0b000000000010000001000000100000010000000000;
+    TEST_ASSERT_MESSAGE(check_win(bb.position)==true,
+                  "01: expected vertical check to be true");
+    initialise_bitboard(&bb);
+    bb.position = 0b000000000000000000000000000001111000000000;
+    TEST_ASSERT_MESSAGE(check_win(bb.position)==true,
+                  "02: expected horizontal check to be true");
+    initialise_bitboard(&bb);
+    bb.position = 0b000000000000000000010000010000010000010000;
+    TEST_ASSERT_MESSAGE(check_win(bb.position)==true,
+                  "03: expected positive check to be true");
+    initialise_bitboard(&bb);
+    bb.position = 0b000000000000000100000001000000010000000100;
+    TEST_ASSERT_MESSAGE(check_win(bb.position)==true,
+                  "04: expected negative check to be true");
+    initialise_bitboard(&bb);
+    bb.position = 0b000000000000000000000001000000010000000100;
+    TEST_ASSERT_MESSAGE(check_win(bb.position)==false,
+                  "05: expected negative check to be fail");
+    initialise_bitboard(&bb);
+    bb.position = 0b000000000000000000000000000000000000111100;
+    bb.mask = 0b000000000000000000000000000000100001111110;
+    TEST_ASSERT_MESSAGE(check_win(bb.position)==true,
+                  "06: expected to find a four");
+    initialise_bitboard(&bb);
+    bb.mask=0b000000000000000001000100100010010001001000;
+    bb.position=0b000000000000000001000000100000010000001000;
+    TEST_ASSERT_MESSAGE(check_win(bb.position)==true,
+                  "07: expected to find a four");
 }
+void test_is_win(bitboard bb){
+    initialise_bitboard(&bb);
+    play(&bb,3); play(&bb,2);
+    play(&bb,4);
+    TEST_ASSERT_MESSAGE(is_win(bb,5)==false,
+                  "01: move into '5' should produce a win");
+    initialise_bitboard(&bb);
+    bb.mask = 0b000000000000000001000000100000110000111010;
+    bb.position = 0b000000000000000001000000000000110000010000;
+    TEST_ASSERT_MESSAGE(is_win(bb,4)==false,
+                  "02: move into '4' should not produce a win");
+    initialise_bitboard(&bb);
+    bb.position = 0b000000000000110000011000100000010110000001;
+    bb.mask = 0b000000100000110001011000101100010111101111;
+    TEST_ASSERT_MESSAGE(is_win(bb,1)==false,
+                  "03: move into '1' should not produce a win");
+    TEST_ASSERT_MESSAGE(is_win(bb,2),
+                  "04: move into '2' should produce a win");
+}
+void test_evaluate(bitboard bb){
+    initialise_bitboard(&bb);
+    bb.position=16780304;
+    bb.mask=16911418;
+    bb.no_moves=8;
+    TEST_ASSERT_MESSAGE(evaluate_bb(bb.position)==60,
+                  "01: evaluation failed got %d",
+                  evaluate_bb(bb.position));
+}
+void test_negamax(bitboard bb){
+    initialise_bitboard(&bb);
+    bb.mask=132233;
+    bb.position=132104;
+    bb.no_moves=5;
+    TEST_ASSERT_MESSAGE(negamax_ab_bb(bb,INT_MAX,INT_MIN,10).score==WIN_SCORE,
+                  "01: expected score to be '%d', got %d",-WIN_SCORE,
+                  negamax_ab_bb(bb,INT_MAX,INT_MIN,10).score);
+    TEST_ASSERT_MESSAGE(negamax_ab_bb(bb,INT_MAX,INT_MIN,10).col==3,
+                  "02: expected column output to be '%d', got %d",3,
+                  negamax_ab_bb(bb,INT_MAX,INT_MIN,10).col);
+    initialise_bitboard(&bb);
+    bb.position=16780304;
+    bb.mask=16911418;
+    bb.no_moves=8;
+    TEST_ASSERT_MESSAGE(negamax_ab_bb(bb,INT_MAX,INT_MIN,0).score==60,
+                  "03: expected score to be '60' but got %d",
+                  negamax_ab_bb(bb,INT_MAX,INT_MIN,0).score);
+}
+
 void app_main(void)
 {
-    int *myBoard = malloc(COLS*ROWS* sizeof(int));
-
-    test_WinMove(myBoard);
-    test_LittleGame(myBoard);
-    test_Evaluation(myBoard);
-    test_Negamax_Draw(myBoard);
-    test_Negamax_WinMove(myBoard);
-    test_Negamax_Search(myBoard);
-
-    free(myBoard);
+    bitboard bb = {0,0,0};
+    test_initialisation(bb);
+    test_can_play(bb);
+    test_play(bb);
+    test_check_win(bb);
+    test_is_win(bb);
+    test_evaluate(bb);
+    test_negamax(bb);
 
     ESP_ERROR_CHECK(nvs_flash_init());
     ESP_ERROR_CHECK(esp_netif_init());
