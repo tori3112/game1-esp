@@ -15,6 +15,8 @@
 #include "esp_vfs.h"
 #include "cJSON.h"
 
+extern char position_string[41];
+
 static const char *REST_TAG = "esp-rest";
 #define REST_CHECK(a, str, goto_tag, ...)                                              \
     do                                                                                 \
@@ -64,9 +66,8 @@ static esp_err_t game_post_handler(httpd_req_t *req) {
 }
 
 static esp_err_t game_get_handler (httpd_req_t *req) {
-    const char message[] = "game initialised";
-    ESP_LOGI(REST_TAG, "Sent data: %s", message);
-    httpd_resp_send(req,message, HTTPD_RESP_USE_STRLEN);
+    ESP_LOGI(REST_TAG, "Sent data: %s", position_string);
+    httpd_resp_send(req,position_string, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 /* END OF MY STRUGGLES */

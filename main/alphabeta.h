@@ -20,7 +20,6 @@ typedef struct {
  * position is zero
  * mask is zero
  * bottom has all ones at the bottom
- * @param bb
  */
 void initialise_bitboard(bitboard* bb);
 
@@ -28,9 +27,6 @@ void initialise_bitboard(bitboard* bb);
  * check if a column is playable
  * check if the last cell of the column is free by
  * by checking the bottom board
- * @param bb
- * @param col
- * @return
  */
 bool can_play(uint64_t bb_mask, int col);
 
@@ -53,6 +49,10 @@ bool check_win(uint64_t position);
  */
 bool is_win(bitboard bb, int col);
 
+/**
+ * negamax algorithm with alpha-beta pruning implementation
+ * with ints (not bits)
+ */
 move negamax_ab(int board[ROWS*COLS], int alpha, int beta, int depth, int turn);
 
 /**
@@ -63,8 +63,16 @@ move negamax_ab(int board[ROWS*COLS], int alpha, int beta, int depth, int turn);
  */
 int* get_exploration_order(int width);
 
+/**
+ * negamax algorithm with alpha-beta pruning
+ * with bitboards implementation
+ */
 move negamax_ab_bb(const bitboard bb, int alpha, int beta, int depth);
 
+/**
+ * method to generate a score for a specific position board
+ * higher score is generated when board has 3 or 2 in a line
+ */
 int evaluate_bb(const uint64_t position);
 
 // HELPER METHODS
@@ -74,7 +82,18 @@ int evaluate_bb(const uint64_t position);
  * of a bitwise representation of a game board
  */
 uint64_t bottom_cell(int col);
+
+/**
+ * identifies the top cell
+ * in a specific column
+ * of a bitwise representation of a game board
+ */
 uint64_t top_cell(int col);
+
+/**
+ * selects a specific column from a board
+ * in a nutshell, a bitboard with 1s only in column specified by @param col
+ */
 uint64_t get_column(int col);
 
 void print_bitboard(bitboard bb);
