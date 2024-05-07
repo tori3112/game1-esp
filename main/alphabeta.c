@@ -195,7 +195,6 @@ move negamax_ab_bb(const bitboard bb, int alpha, int beta, int depth) {
             return move1;
         }
     }
-    int best_score = INT_MIN;
     move best_move = {-1, INT_MIN};
     int *order = get_exploration_order(COLS);
     for (int i=0; i<COLS; i++) {

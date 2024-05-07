@@ -15,9 +15,15 @@
 #include "esp_vfs.h"
 #include "cJSON.h"
 
-extern char position_string[41];
 
-static const char *REST_TAG = "esp-rest";
+extern char position_string[41];
+extern char outcome_message[80];
+extern void run_game();
+extern TaskHandle_t task_handler;
+extern bool game_over;
+extern bool init;
+
+static const char *REST_TAG = "rest-GAME1";
 #define REST_CHECK(a, str, goto_tag, ...)                                              \
     do                                                                                 \
     {                                                                                  \
@@ -57,19 +63,45 @@ static esp_err_t game_post_handler(httpd_req_t *req) {
         }
         cur_len += received;
     }
+    init = true;
+    buffer[cur_len] = '\0';
     cJSON *root = cJSON_Parse(buffer);
     cJSON *item = cJSON_GetObjectItemCaseSensitive(root,"message");
     char *msg = item->valuestring;
+    if (strncmp(msg, "game is ready", sizeof("game is ready") - 1) == 0) {
+        if (task_handler == NULL) {
+            if (xTaskCreate(&run_game, "GAME", 4096, NULL, 10, &task_handler) != pdPASS) {
+                ESP_LOGE(REST_TAG, "Failed to create game loop task");
+                httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to create game loop task");
+                return ESP_FAIL;
+            }
+        }
+        init = true;
+        httpd_resp_send(req, "Game initialized", HTTPD_RESP_USE_STRLEN);
+    } else {
+        httpd_resp_send_500(req);
+    }
     ESP_LOGI(REST_TAG, "Received data: %s", msg);
-    httpd_resp_sendstr(req, "data received successfully");
     return ESP_OK;
+}
+static esp_err_t game_get_handler (httpd_req_t *req) {
+    cJSON *root = cJSON_CreateObject();
+    if (root == NULL) {
+        ESP_LOGE(REST_TAG, "Failed to create cJSON object");
+        return ESP_FAIL;
+    }
+
+    if (!game_over) {
+        ESP_LOGI(REST_TAG, "Sent data: %s", position_string);
+        httpd_resp_send(req, position_string, HTTPD_RESP_USE_STRLEN);
+        return ESP_OK;
+    } else {
+        ESP_LOGI(REST_TAG, "Sent data: %s", outcome_message);
+        httpd_resp_send(req, outcome_message, HTTPD_RESP_USE_STRLEN);
+        return ESP_OK;
+    }
 }
 
-static esp_err_t game_get_handler (httpd_req_t *req) {
-    ESP_LOGI(REST_TAG, "Sent data: %s", position_string);
-    httpd_resp_send(req,position_string, HTTPD_RESP_USE_STRLEN);
-    return ESP_OK;
-}
 /* END OF MY STRUGGLES */
 
 esp_err_t start_rest_server(const char *base_path)

@@ -28,7 +28,7 @@
 #include "game.h"
 #include "limits.h"
 
-#include "wifi.h"
+
 
 #if CONFIG_EXAMPLE_WEB_DEPLOY_SD
 #include "driver/sdmmc_host.h"
@@ -37,9 +37,12 @@
 #define MDNS_INSTANCE "esp home web server"
 
 static const char *TAG = "GAME1";
-static const char *TEST_TAG = "esp-test";
+static const char *TEST_TAG = "game-test";
+bool game_over;
+bool init;
 
-char position_string[41] = {};
+char position_string[41];
+char outcome_message[85];
 
 TaskHandle_t task_handler = NULL;
 
@@ -151,74 +154,88 @@ esp_err_t init_fs(void)
 
 
 void run_game() {
+    init=false;
     while (1) {
-        vTaskDelay(100/portTICK_PERIOD_MS);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
         //GAME INITIALISATION
-        bitboard bb = {0, 0, 0};
-        bool game_over = false;
-        int turn = HUMAN;
+        if (init) {
+            bitboard bb = {0, 0, 0};
+            game_over = false;
+            int turn = HUMAN;
 
-        while (!game_over) {
-            switch (turn) {
-                // HUMAN INPUT
-                case HUMAN:
-                    /**
-                     * PLACE FOR GETTING SIGNALS
-                     * FROM SENSORS
-                     */
-                     char moveH = '2';
-                    play(&bb, 2);
-                    strncat(position_string,&moveH,1);
-                    game_over = check_win(bb.position);
-                    if (game_over) {
-                        TEST_ASSERT_MESSAGE(false,"game won by human");
-                        vTaskDelete(task_handler);
-                        //initialise_bitboard(&bb);
-                    } else {
-                        turn = COMPUTER;
-                    }
-                    break;
-                case COMPUTER:
-                    // move next_move = negamax_ab_bb(bb,UINT64_MIN,UINT64_MAX,20);
-                    /**
-                     * PLACE FOR SENDING SIGNAL
-                     * TO THE SERVOMOTORS
-                     */
-                    // play(&bb,next_move.col);
-                    char moveC = '4';
-                    play(&bb, 4);
-                    strncat(position_string,&moveC,1);
-                    // SEND MESSAGE
-                    game_over = check_win(bb.position);
-                    if (game_over) {
-                        TEST_ASSERT_MESSAGE(false,"game won by computer");
-                        vTaskDelete(task_handler);
-                        //initialise_bitboard(&bb);
-                    } else {
-                        turn = HUMAN;
-                    }
-                    break;
-                default:
-                    TEST_ASSERT_MESSAGE(false, "something went wrong, shouldn't get to default");
+            while (!game_over) {
+                switch (turn) {
+                    // HUMAN INPUT
+                    case HUMAN:
+                        /**
+                         * PLACE FOR GETTING SIGNALS
+                         * FROM SENSORS
+                         */
+                        char moveH = '2';
+                        play(&bb, 2);
+                        strncat(position_string, &moveH, 1);
+                        //play(&bb,@move_by_human);
+                        //strncat(position_string,&moveH,1);
+                        vTaskDelay(100 / portTICK_PERIOD_MS);
+                        game_over = check_win(bb.position);
+                        if (game_over) {
+                            TEST_ASSERT_MESSAGE(false, "game won by human");
+                            strcpy(outcome_message, "Congratulations, you won! Press the reset button to play again.");
+                            vTaskDelay(100 / portTICK_PERIOD_MS);
+                            vTaskDelete(task_handler);
+                            //initialise_bitboard(&bb);
+                        } else {
+                            turn = COMPUTER;
+                        }
+                        break;
+                    case COMPUTER:
+                        // move next_move = negamax_ab_bb(bb,UINT64_MIN,UINT64_MAX,20);
+                        /**
+                         * PLACE FOR SENDING SIGNAL
+                         * TO THE SERVOMOTORS
+                         */
+                        //COMPUTER RESPONSE
+                        //play(&bb,next_move.col);
+                        //strncat(position_string,&moveC,1);
+                        char moveC = '4';
+                        play(&bb, 4);
+                        strncat(position_string, &moveC, 1);
+                        vTaskDelay(100 / portTICK_PERIOD_MS);
+                        // SEND MESSAGE
+                        game_over = check_win(bb.position);
+                        if (game_over) {
+                            TEST_ASSERT_MESSAGE(false, "game won by computer");
+                            strcpy(outcome_message,
+                                   "Unfortunately you lost, better luck next time! Press the reset button to try again.");
+                            vTaskDelay(100 / portTICK_PERIOD_MS);
+                            vTaskDelete(task_handler);
+                            //initialise_bitboard(&bb);
+                        } else {
+                            turn = HUMAN;
+                        }
+                        break;
+                    default:
+                        TEST_ASSERT_MESSAGE(false, "something went wrong, shouldn't get to default");
+                }
             }
         }
     }
 }
 
 void app_main(void)
-{
-    initNvs();
-    setupWifi();
-
+{   /* INITIALISE SOME COMPONENTS */
+    ESP_ERROR_CHECK(nvs_flash_init());
+    ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     initialise_mdns();
     netbiosns_init();
     netbiosns_set_name(CONFIG_EXAMPLE_MDNS_HOST_NAME);
-
+    /* CONNECT TO WIFI AND START RESTFUL SERVER */
     ESP_ERROR_CHECK(example_connect());
     ESP_ERROR_CHECK(init_fs());
     ESP_ERROR_CHECK(start_rest_server(CONFIG_EXAMPLE_WEB_MOUNT_POINT));
-
+    /* CREATE TASK FOR THE GAME LOOP*/
+    vTaskDelay(10000 / portTICK_PERIOD_MS);
     xTaskCreate(run_game,"GAME",4096,NULL,10,&task_handler);
 
 }
